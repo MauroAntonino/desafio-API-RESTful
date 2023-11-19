@@ -6,10 +6,19 @@ services:
       - static:/static
     env_file:
       - .env
+    environment:
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_HOST: ${MYSQL_HOST}
+        MYSQL_USER: ${MYSQL_USER}
     build:
       context: .
     ports:
       - "8000:8000"
+    networks:
+      - backend
+  
   nginx:
     build: ./nginx
     volumes:
@@ -18,7 +27,28 @@ services:
       - "80:80"
     depends_on:
       - django_gunicorn
+    networks:
+      - backend
+
+  mysql:
+    container_name: mysql
+    build: ./mysql
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    env_file: .env
+    environment:
+        # MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_DATABASE: Desafio
+    networks:
+      - backend
+
+networks:
+  backend:
 
 volumes:
+  todo-mysql-data:
   static:
 
