@@ -72,18 +72,46 @@ class UserRepositoryAdapter(UserRepositoryInterface):
             password_code = response[0][0]
         except:
             raise(Exception("user not found"))
-        logger.debug(password_code)
         m = hashlib.sha256()
         m.update(json.dumps(password).encode("utf-8"))
         password = str(m.hexdigest())
-        logger.debug(password)
         if (password_code == password):
             return True
         else:
             return False
 
-    def update_user(self, email, name, password) -> User:
-        pass
+    def update_user(self, user: User) -> User:
+        db = self.db.connect()
+        cursor = db.cursor()
+        query = None
+        if (user.name != None):
+            query = ("UPDATE User SET name = '{name}' WHERE email = '{email}'".format(email=user.email, name=user.name))
+        try:
+            cursor.execute(query)
+        except:
+            raise Exception("User does not exist")
+        
+        if (user.password != None):
+            m = hashlib.sha256()
+            m.update(json.dumps(user.password).encode("utf-8"))
+            password = str(m.hexdigest())
+            query = ("UPDATE User SET password = '{password}' WHERE email = '{email}'".format(email=user.email, password=password))
+        try:
+            cursor.execute(query)
+        except:
+            raise Exception("User does not exist")
+        
+        query = ("SELECT id, image_url FROM User WHERE email = '{email}'".format(email=user.email))
+        cursor.execute(query)
+        response = [item for item in cursor]
+        id, image_url = response[0][0], response[0][1]
+        user.user_id = id
+        user.image_url = image_url
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        return user
     
     def save_image(self, image, user: User):
         try:

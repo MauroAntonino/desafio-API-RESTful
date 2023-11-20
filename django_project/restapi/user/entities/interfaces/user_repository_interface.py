@@ -20,7 +20,7 @@ class UserRepositoryInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
     
     @abc.abstractmethod
-    def update_user(self, user: User, image) -> User:
+    def update_user(self, user: User) -> User:
         """Update User"""
         raise NotImplementedError
     
