@@ -6,6 +6,9 @@ from restapi.user.entities.objects.user import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
+from os import path
+basedir = path.abspath(path.dirname(__file__))
+uploads_path = path.join(basedir, 'static')
 
 userService = UserService(user_repository=UserRepositoryAdapter(MySql))
 
@@ -37,3 +40,16 @@ def logout(request):
     except:
         return JsonResponse({"msg": "already logged out"})
     return JsonResponse({"msg": "successfully logged out"})
+
+@csrf_exempt
+@api_view(["GET"])
+def serve_image(request, id, email):
+    try:
+        path = uploads_path + "/" + id + "/" + email + ".jpeg"
+
+        image_data = open(path, "rb").read()
+        if image_data == None:
+            return HttpResponse("File not Found")
+        return HttpResponse(image_data, mimetype="image/jpeg")
+    except:
+        HttpResponse("File not Found")

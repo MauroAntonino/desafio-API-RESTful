@@ -28,8 +28,8 @@ class UserRepositoryInterface(metaclass=abc.ABCMeta):
     def save_image(self, image):
         """Save User Image"""
         raise NotImplementedError
-
+    
     @abc.abstractmethod
-    def get_image(self, image):
+    def get_movies(self, page_size, page, search, order):
         """Save User Image"""
         raise NotImplementedError
