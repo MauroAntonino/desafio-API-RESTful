@@ -15,6 +15,6 @@ class UserEmailInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
     
     @abc.abstractmethod
-    def send_email(email, token):
+    def email_send_token(email, token):
         """Send Email"""
         raise NotImplementedError

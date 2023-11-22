@@ -31,5 +31,22 @@ class UserRepositoryInterface(metaclass=abc.ABCMeta):
     
     @abc.abstractmethod
     def get_movies(self, page_size, page, search, order):
-        """Save User Image"""
+        """Get Best Movies"""
         raise NotImplementedError
+    
+    @abc.abstractmethod
+    def is_email_checked(self, email):
+        """Get If Email Is Checked"""
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def get_best_movies(self, page_size, page, search, order):
+        """Get Best Movies"""
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def email_is_valid(self, email):
+        """Update is_valid Field"""
+        raise NotImplementedError
+    
+    

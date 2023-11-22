@@ -1,13 +1,14 @@
 from django.http import HttpResponse
 from restapi.user.usecases.user_service import UserService
 from restapi.user.adapters.repository.user_repository_adapter import UserRepositoryAdapter
+from restapi.user.adapters.email.user_email_adapter import UserEmailAdapter
 from restapi.user.infra.repository.mysql import MySql
 from restapi.user.entities.objects.movie import Movie
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from os import path
-userService = UserService(user_repository=UserRepositoryAdapter(MySql))
+userService = UserService(user_repository=UserRepositoryAdapter(MySql), user_email=UserEmailAdapter(MySql))
 
 @csrf_exempt
 @api_view(["GET"])

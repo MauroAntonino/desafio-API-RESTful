@@ -7,3 +7,4 @@ class User:
     name: str
     password: str
     image_url: str
+    is_confirmed: str

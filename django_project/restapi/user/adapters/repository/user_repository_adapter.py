@@ -6,6 +6,8 @@ import hashlib
 import json
 import logging
 from os import getenv, path, makedirs
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 import re
 logger = logging.getLogger(__name__)
 basedir = path.abspath(path.dirname(__file__))
@@ -36,26 +38,28 @@ class UserRepositoryAdapter(UserRepositoryInterface):
         m.update(json.dumps(user.password).encode("utf-8"))
         password = str(m.hexdigest())
         email = user.email
-        extension = ".jpeg"
-        user.image_url = "/{id}/{image_name}{extension}".format(id=id, image_name=user.email, extension=extension)
+        user.image_url = id
         image_url = user.image_url
         
-        query = ("INSERT INTO User ( name, password, email, id, image_url )"
-                 "VALUES( '{name}', '{password}', '{email}', '{id}', '{image_url}');".format(
+        query = ("INSERT INTO User ( name, password, email, id, image_url, is_confirmed )"
+                 "VALUES( '{name}', '{password}', '{email}', '{id}', '{image_url}', '{is_confirmed}');".format(
                     password=password, 
                     email=email,
                     id=id,
                     name=user.name,
-                    image_url=image_url
+                    image_url=image_url,
+                    is_confirmed=0
                 ))
         try:
             cursor.execute(query)
-        except:
+        except Exception as ex:
+            logger.error(ex)
             raise Exception('User already exists')
         db.commit()
         cursor.close()
         db.close()
         user.user_id = id
+        user.is_confirmed = False
         return user
     
     def check_user(self, email, password) -> bool:
@@ -101,12 +105,13 @@ class UserRepositoryAdapter(UserRepositoryInterface):
         except:
             raise Exception("User does not exist")
         
-        query = ("SELECT id, image_url FROM User WHERE email = '{email}'".format(email=user.email))
+        query = ("SELECT id, image_url, is_confirmed FROM User WHERE email = '{email}'".format(email=user.email))
         cursor.execute(query)
         response = [item for item in cursor]
-        id, image_url = response[0][0], response[0][1]
+        id, image_url, is_confirmed = response[0][0], response[0][1], response[0][2]
         user.user_id = id
         user.image_url = image_url
+        user.is_confirmed = is_confirmed
         
         db.commit()
         cursor.close()
@@ -114,15 +119,11 @@ class UserRepositoryAdapter(UserRepositoryInterface):
         return user
     
     def save_image(self, image, user: User):
-        try:
-            dir = uploads_path + user.image_url
-            if not path.exists(dir[:-len(image.filename)]):
-                # If it doesn't exist, create it
-                makedirs(dir[:-len(image.filename)])
-
-            image.save(path.join(dir[:-len(image.filename)], image.filename))
-        except Exception as ex:
-            print(ex)
+        if image != None:
+            image.name = str(user.user_id)
+            fs = FileSystemStorage(location=settings.STATIC_ROOT)
+            filename = fs.save(image.name, image)
+            logger.info(filename)
         return "success"
 
     def get_movies(self, page_size, page, search, order):
@@ -157,3 +158,66 @@ class UserRepositoryAdapter(UserRepositoryInterface):
             print(ex)
             raise(Exception("Faiel getting movies"))
         return movie_list
+    
+    def get_best_movies(self, page_size, page, search, order):
+        db = self.db.connect()
+        cursor = db.cursor()
+        if search == None:
+            query = ("SELECT name, rating, year FROM BestMovie "
+                    "LIMIT {page}, {page_size};".format(page_size=page_size, page=page, search=search, order=order))
+        if search != None:
+            query = ("SELECT name, rating, year FROM BestMovie "
+                    "WHERE name LIKE '%{search}%' "
+                    "LIMIT {page}, {page_size};".format(page_size=page_size, page=page, search=search, order=order))
+        cursor.execute(query)
+        response = [item for item in cursor]
+        cursor.close()
+        db.close()
+        try:
+            movie_list = []
+            for item in response:
+                name, rating, year = item[0], item[1], item[2]
+                movie = Movie(
+                                name=name, 
+                                rating=rating, 
+                                year=year
+                            )
+                movie_list.append(movie)
+            if order == "year":
+                movie_list.sort(key=lambda x: x.year, reverse=True)
+            if order == "rating":
+                movie_list.sort(key=lambda x: x.rating, reverse=True)
+        except Exception as ex:
+            print(ex)
+            raise(Exception("Faiel getting movies"))
+        return movie_list
+    
+    def email_is_valid(self, email):
+        db = self.db.connect()
+        cursor = db.cursor()
+        query = ("UPDATE User SET is_confirmed = '{is_confirmed}' WHERE email = '{email}'".format(email=email, is_confirmed=1))
+        try:
+            cursor.execute(query)
+        except:
+            raise Exception("User does not exist")
+        
+        db.commit()
+        cursor.close()
+        db.close()
+    
+    def is_email_checked(self, email):
+        db = self.db.connect()
+        cursor = db.cursor()
+        
+        query = ("SELECT is_confirmed FROM User WHERE email = '{email}'".format(email=email))
+        cursor.execute(query)
+        response = [item for item in cursor]
+        is_confirmed = response[0][0]
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        if int(is_confirmed) == 0:
+            return False
+        else:
+            return True

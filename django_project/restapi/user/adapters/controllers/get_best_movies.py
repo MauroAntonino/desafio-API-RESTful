@@ -3,35 +3,29 @@ from restapi.user.usecases.user_service import UserService
 from restapi.user.adapters.repository.user_repository_adapter import UserRepositoryAdapter
 from restapi.user.adapters.email.user_email_adapter import UserEmailAdapter
 from restapi.user.infra.repository.mysql import MySql
-from restapi.user.entities.objects.user import User
+from restapi.user.entities.objects.movie import Movie
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from os import path
-basedir = path.abspath(path.dirname(__file__))
-uploads_path = path.join(basedir, 'static')
-
 userService = UserService(user_repository=UserRepositoryAdapter(MySql), user_email=UserEmailAdapter(MySql))
 
 @csrf_exempt
-@api_view(["POST"])
-def update_user(request):
+@api_view(["GET"])
+def get_best_movies(request):
     try:
-        if request.method == 'POST':
-            image = request.data.get('new_image')
-            user = User(
-                name=request.data.get("new_name"),
-                password=request.data.get("new_password"),
-                email=request.data.get("email"),
-                user_id=None,
-                image_url=None,
-                is_confirmed=False
-            )
+        if request.method == 'GET':
+            page_size = request.GET.get("page_size", 3)
+            page = request.GET.get("page", 0)
+            search = request.GET.get("search", None)
+            order = request.GET.get("order", None)
+            email = request.GET.get("email", None)
             if request.session.get('user',None) != None:
-                user = userService.update_user(user=user, image=image)
-                return JsonResponse(user, safe=False)
+                movies_list = userService.get_best_movies(page_size=page_size, page=page, search=search, order=order, email=email)
+                return JsonResponse(movies_list, safe=False)
             else:
                 return JsonResponse({"msg": "You are not logged in"})
+            
     except Exception as ex: 
         print(ex)
         return JsonResponse({"msg": str(ex)})

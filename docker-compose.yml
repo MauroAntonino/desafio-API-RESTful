@@ -45,6 +45,7 @@ services:
         MYSQL_DATABASE: Desafio
     networks:
       - backend
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
 
 networks:
   backend:
