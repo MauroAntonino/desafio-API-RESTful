@@ -1,6 +1,6 @@
 # desafio-API-RESTful
 
-"To execute the project, all you need to do is run the following command:
+To execute the project, all you need to do is run the following command:
 
 <code>
 docker compose build
