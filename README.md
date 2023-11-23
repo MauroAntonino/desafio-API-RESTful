@@ -2,19 +2,19 @@
 
 To execute the project, all you need to do is run the following command:
 
-<code>
+<p><code>
 docker compose build
-</code>
+</code></p>
 
  and
 
-<code>
+<p><code>
 docker compose up -d
-</code>
+</code></p>
  
 To execute tests, you need to install the requirements.txt file and 
 run the following command in the same directory where the test folder is located.
 
-<code>
+<p><code>
  python -m unittest discover test
-</code>
+</code></p>
