@@ -1,5 +1,6 @@
 import abc
 from restapi.user.entities.objects.user import User
+from restapi.user.entities.objects.movie import Movie
 from typing import List
 
 class UserRepositoryInterface(metaclass=abc.ABCMeta):
@@ -24,18 +25,22 @@ class UserRepositoryInterface(metaclass=abc.ABCMeta):
         """Update User"""
         raise NotImplementedError
     
+    def validate_update_user(self, user: User) -> User:
+        """Validate Update User"""
+        raise NotImplementedError
+    
     @abc.abstractmethod
     def save_image(self, image):
         """Save User Image"""
         raise NotImplementedError
     
     @abc.abstractmethod
-    def get_movies(self, page_size, page, search, order):
+    def get_movies(self, page_size, page, search, order) -> List[Movie]:
         """Get Best Movies"""
         raise NotImplementedError
     
     @abc.abstractmethod
-    def is_email_checked(self, email):
+    def is_email_checked(self, email) -> bool:
         """Get If Email Is Checked"""
         raise NotImplementedError
     

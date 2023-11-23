@@ -28,6 +28,20 @@ class UserRepositoryAdapter(UserRepositoryInterface):
         
         if (type(user.name) == str) and (len(user.name) < 5):
             raise Exception("Make sure your user name is at lest 5 letters")
+    
+    def validate_update_user(self, user: User):
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+        if user.email != None:
+            if(not re.fullmatch(regex, user.email)):
+                raise Exception("Invalid Email")
+        
+        if user.password != None:
+            if len(user.password) < 8:
+                raise Exception("Make sure your password is at lest 8 letters")
+        
+        if user.name != None:
+            if (type(user.name) == str) and (len(user.name) < 5):
+                raise Exception("Make sure your user name is at lest 5 letters")
       
 
     def create_user(self, user: User) -> User:
@@ -156,7 +170,7 @@ class UserRepositoryAdapter(UserRepositoryInterface):
                 movie_list.sort(key=lambda x: x.rating, reverse=True)
         except Exception as ex:
             print(ex)
-            raise(Exception("Faiel getting movies"))
+            raise Exception("Failed getting movies")
         return movie_list
     
     def get_best_movies(self, page_size, page, search, order):
@@ -189,7 +203,7 @@ class UserRepositoryAdapter(UserRepositoryInterface):
                 movie_list.sort(key=lambda x: x.rating, reverse=True)
         except Exception as ex:
             print(ex)
-            raise(Exception("Faiel getting movies"))
+            raise Exception("Failed getting movies")
         return movie_list
     
     def email_is_valid(self, email):
@@ -210,7 +224,11 @@ class UserRepositoryAdapter(UserRepositoryInterface):
         cursor = db.cursor()
         
         query = ("SELECT is_confirmed FROM User WHERE email = '{email}'".format(email=email))
-        cursor.execute(query)
+        try:
+            cursor.execute(query)
+        except Exception as ex:
+            logger.error(ex)
+            raise Exception('User already exists')
         response = [item for item in cursor]
         is_confirmed = response[0][0]
         

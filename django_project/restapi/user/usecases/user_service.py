@@ -32,7 +32,7 @@ class UserService:
             return {"msg": "user email is not checked"}
 
     def update_user(self, user: User, image):
-        self.user_repository.validate_user(user)
+        self.user_repository.validate_update_user(user)
         user = self.user_repository.update_user(user=user)
         self.user_repository.save_image(image=image, user=user)
         return {

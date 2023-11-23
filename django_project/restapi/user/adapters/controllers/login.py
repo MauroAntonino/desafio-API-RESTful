@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from restapi.user.usecases.user_service import UserService
 from restapi.user.adapters.repository.user_repository_adapter import UserRepositoryAdapter
 from restapi.user.adapters.email.user_email_adapter import UserEmailAdapter
@@ -6,6 +5,8 @@ from restapi.user.infra.repository.mysql import MySql
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
+import logging
+logger = logging.getLogger(__name__)
 
 userService = UserService(user_repository=UserRepositoryAdapter(MySql), user_email=UserEmailAdapter(MySql))
 

@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from restapi.user.usecases.user_service import UserService
 from restapi.user.adapters.repository.user_repository_adapter import UserRepositoryAdapter
 from restapi.user.adapters.email.user_email_adapter import UserEmailAdapter
