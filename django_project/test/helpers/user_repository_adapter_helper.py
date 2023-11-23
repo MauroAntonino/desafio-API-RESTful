@@ -69,32 +69,25 @@ class UserRepositoryAdapterHelper(UserRepositoryInterface):
       
 
     def create_user(self, user: User) -> User:
-        # raise Exception('User already exists')
         pass
-
     
     def check_user(self, email, password) -> bool:
         pass
 
     def update_user(self, user: User) -> User:
-        # Exception("User does not exist")
         pass
     
     def save_image(self, image, user: User):
         pass
 
     def get_movies(self, page_size, page, search, order) -> List[Movie]:
-        # Exception("Failed getting movies")
         pass
     
     def get_best_movies(self, page_size, page, search, order) -> List[Movie]:
-        # Exception("Failed getting movies")
         pass
     
     def email_is_valid(self, email):
-        # Exception("User does not exist")
         pass
     
     def is_email_checked(self, email) -> bool:
-        # Exception("User does not exist")
         pass
