@@ -1,25 +1,24 @@
 # desafio-API-RESTful
 
-To execute the project, all you need to do is run the following command:
+> To execute the project, all you need to do is run the following command:
 
-<p><code>
+<pre><code>
 docker compose build
-</code></p>
+</code></pre>
 
- and
+ > and
 
-<p><code>
+<pre><code>
 docker compose up -d
-</code></p>
+</code></pre>
 
-<p>
-the host is localhost
-and the port is 80
-</p>
+
+> the host is localhost
+> and the port is 80
  
-To execute tests, you need to install the requirements.txt file and 
-run the following command in the same directory where the test folder is located.
+> To execute tests, you need to install the requirements.txt file and 
+> run the following command in the same directory where the test folder is located.
 
-<p><code>
+<pre><code>
  python -m unittest discover test
-</code></p>
+</code></pre>
